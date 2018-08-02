@@ -4,4 +4,7 @@
     <string name="no_news">sorry! no News</string>
     <string name="settings_title">News Settings</string>
     <string name="settings_menu_item">Settings</string>
-</resources>
+    <string name="settings_min_news_label">NUMBER OF NEWS</string>
+    <string name="settings_min_news_key" translatable="false">number_of_news</string>
+    <string name="settings_min_news_default" translatable="false">10</string>
+    </resources>
