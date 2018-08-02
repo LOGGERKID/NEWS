@@ -23,12 +23,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<News>> {
+public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<News>>,SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String LOG_TAG = MainActivity.class.getName();
 
     private static final String NEWS_REQUEST_URL ="https://content.guardianapis.com/search?";
-           // "https://content.guardianapis.com/search?order-by=newest&page-size=20&q=business&api-key=20d8f873-f30f-467b-8753-b3211aa589ec";
 
     private TextView mEmptyStateTextView;
     private NewsAdapter mAdapter;
@@ -45,6 +44,9 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         newsListView.setEmptyView(mEmptyStateTextView);
         mAdapter = new NewsAdapter(this, new ArrayList<News>());
         newsListView.setAdapter(mAdapter);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+
 
         newsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -61,25 +63,15 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            // Get a reference to the LoaderManager, in order to interact with loaders.
             LoaderManager loaderManager = getLoaderManager();
-
-            // Initialize the loader. Pass in the int ID constant defined above and pass in null for
-            // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
-            // because this activity implements the LoaderCallbacks interface).
             loaderManager.initLoader(NEWS_LOADER_ID, null, this);
         } else {
-            // Otherwise, display error
-            // First, hide loading indicator so error message will be visible
             View loadingIndicator = findViewById(R.id.loading_indicator);
             loadingIndicator.setVisibility(View.GONE);
 
-            // Update empty state with no connection error message
             mEmptyStateTextView.setText(R.string.no_internet_connection);
             Log.e(LOG_TAG,"check networking on create");
         }
-
-
     }
 
     @Override
@@ -102,14 +94,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         View loadingIndicator = findViewById(R.id.loading_indicator);
         loadingIndicator.setVisibility(View.GONE);
 
-        // Set empty state text to display "No earthquakes found."
         mEmptyStateTextView.setText(R.string.no_news);
-
-        // Clear the adapter of previous earthquake data
-        //mAdapter.clear();
-
-        // If there is a valid list of {@link Earthquake}s, then add them to the adapter's
-        // data set. This will trigger the ListView to update.
         if (newses != null && !newses.isEmpty()) {
             mAdapter.addAll(newses);
         }
@@ -134,5 +119,16 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.settings_min_news_key))){
+            mAdapter.clear();
+            mEmptyStateTextView.setVisibility(View.GONE);
+            View loadingIndicator = findViewById(R.id.loading_indicator);
+            loadingIndicator.setVisibility(View.VISIBLE);
+            getLoaderManager().restartLoader(NEWS_LOADER_ID, null, this);
+        }
     }
 }
