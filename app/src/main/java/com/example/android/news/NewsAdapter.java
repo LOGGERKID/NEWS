@@ -3,6 +3,7 @@ package com.example.android.news;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,18 +26,21 @@ public class NewsAdapter extends ArrayAdapter<News> {
         }
 
         News currentNews = getItem(position);
-        TextView head = (TextView) listItemView.findViewById(R.id.headline_text_view);
+        TextView head = listItemView.findViewById(R.id.headline_text_view);
         assert currentNews != null;
         head.setText(currentNews.getNewsHeadline());
-        TextView detail = (TextView) listItemView.findViewById(R.id.section_author_textview);
+        TextView detail = listItemView.findViewById(R.id.section_author_textview);
         String details;
-        if(currentNews.getAuthor()==null) {
+        if(TextUtils.isEmpty(currentNews.getAuthor())) {
+            detail.setText(currentNews.getSectionName());
+        }
+        else{
             details=(currentNews.getSectionName()+" by "+currentNews.getAuthor());
             detail.setText(details);
         }
-        else
-            detail.setText(currentNews.getSectionName());
-        TextView date =(TextView) listItemView.findViewById(R.id.date_text);
+
+           detail.setText(currentNews.getSectionName());
+        TextView date =listItemView.findViewById(R.id.date_text);
         String[] dates = currentNews.getDate().split("T");
         date.setText(dates[0]);
 
