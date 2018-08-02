@@ -5,16 +5,18 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,8 +27,8 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     private static final String LOG_TAG = MainActivity.class.getName();
 
-    private static final String NEWS_REQUEST_URL =
-            "https://content.guardianapis.com/search?order-by=newest&page-size=20&q=business&api-key=20d8f873-f30f-467b-8753-b3211aa589ec";
+    private static final String NEWS_REQUEST_URL ="https://content.guardianapis.com/search?";
+           // "https://content.guardianapis.com/search?order-by=newest&page-size=20&q=business&api-key=20d8f873-f30f-467b-8753-b3211aa589ec";
 
     private TextView mEmptyStateTextView;
     private NewsAdapter mAdapter;
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
             // Update empty state with no connection error message
             mEmptyStateTextView.setText(R.string.no_internet_connection);
+            Log.e(LOG_TAG,"check networking on create");
         }
 
 
@@ -81,7 +84,17 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
     @Override
     public Loader<List<News>> onCreateLoader(int id, Bundle args) {
-        return new NewsLoader(this, NEWS_REQUEST_URL);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String minNews = sharedPrefs.getString(
+                getString(R.string.settings_min_news_key),
+                getString(R.string.settings_min_news_default));
+        Uri baseUri = Uri.parse(NEWS_REQUEST_URL);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+        uriBuilder.appendQueryParameter("order-by", "newest");
+        uriBuilder.appendQueryParameter("page-size", minNews);
+        uriBuilder.appendQueryParameter("q","business");
+        uriBuilder.appendQueryParameter("api-key", "20d8f873-f30f-467b-8753-b3211aa589ec");
+        return new NewsLoader(this, uriBuilder.toString());
     }
 
     @Override
