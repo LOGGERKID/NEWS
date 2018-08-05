@@ -83,8 +83,8 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         Uri baseUri = Uri.parse(NEWS_REQUEST_URL);
         Uri.Builder uriBuilder = baseUri.buildUpon();
         uriBuilder.appendQueryParameter("order-by", "newest");
-        uriBuilder.appendQueryParameter("show-references", "author")
-        uriBuilder.appendQueryParameter("show-tags", "contributor")
+        uriBuilder.appendQueryParameter("show-references", "author");
+        uriBuilder.appendQueryParameter("show-tags", "contributor");
         uriBuilder.appendQueryParameter("page-size", minNews);
         uriBuilder.appendQueryParameter("q","business");
         uriBuilder.appendQueryParameter("api-key", "20d8f873-f30f-467b-8753-b3211aa589ec");
