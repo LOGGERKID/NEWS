@@ -38,8 +38,7 @@ public class NewsAdapter extends ArrayAdapter<News> {
             details=(currentNews.getSectionName()+" by "+currentNews.getAuthor());
             detail.setText(details);
         }
-
-           detail.setText(currentNews.getSectionName());
+        
         TextView date =listItemView.findViewById(R.id.date_text);
         String[] dates = currentNews.getDate().split("T");
         date.setText(dates[0]);
